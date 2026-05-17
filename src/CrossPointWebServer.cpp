@@ -28,7 +28,9 @@
 #include "network/CrossPointWebServer.h"
 
 namespace {
-constexpr int SIMULATOR_WEB_PORT = 8080;
+#ifndef SIMULATOR_WEB_PORT
+#define SIMULATOR_WEB_PORT 8080
+#endif
 constexpr size_t MAX_BODY_SIZE = 256UL * 1024UL * 1024UL;
 
 struct Request {

@@ -1,5 +1,9 @@
 #include "WebServer.h"
 
+#ifndef SIMULATOR_WEB_PORT
+#define SIMULATOR_WEB_PORT 8080
+#endif
+
 #include <Logging.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -273,7 +277,7 @@ struct WebServer::Impl {
     std::function<void()> uploadHandler;
   };
 
-  explicit Impl(int serverPort) : port(serverPort == 80 ? 8080 : serverPort) {}
+  explicit Impl(int serverPort) : port(serverPort == 80 ? SIMULATOR_WEB_PORT : serverPort) {}
 
   int port;
   int fd = -1;
