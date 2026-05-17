@@ -13,7 +13,7 @@ OtaUpdater::OtaUpdaterError OtaUpdater::checkForUpdate() {
   return NO_UPDATE;
 }
 
-OtaUpdater::OtaUpdaterError OtaUpdater::installUpdate(ProgressCallback, void*) {
+OtaUpdater::OtaUpdaterError OtaUpdater::installUpdate() {
   LOG_DBG("OTA", "[SIM] OTA install is not supported in the native simulator");
   return INTERNAL_UPDATE_ERROR;
 }

@@ -87,6 +87,6 @@ bool HttpDownloader::fetchUrl(const std::string&, Stream&, const std::string&, c
   return false;
 }
 
-HttpDownloader::DownloadError HttpDownloader::downloadToFile(const std::string&, const std::string&, ProgressCallback, bool*, const std::string&, const std::string&) {
+HttpDownloader::DownloadError HttpDownloader::downloadToFile(const std::string&, const std::string&, ProgressCallback, const std::string&, const std::string&) {
   return HTTP_ERROR;
 }
