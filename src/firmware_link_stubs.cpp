@@ -4,6 +4,8 @@
 // own definitions to satisfy the linker.
 
 #include <cstdint>
+#include <functional>
+#include <string>
 
 #include <Logging.h>
 
@@ -73,4 +75,18 @@ extern "C" uint32_t uzlib_crc32(const void *data, unsigned int length,
     buf++;
   }
   return crc ^ 0xffffffff;
+}
+
+#include "network/HttpDownloader.h"
+
+bool HttpDownloader::fetchUrl(const std::string&, std::string&, const std::string&, const std::string&) {
+  return false;
+}
+
+bool HttpDownloader::fetchUrl(const std::string&, Stream&, const std::string&, const std::string&) {
+  return false;
+}
+
+HttpDownloader::DownloadError HttpDownloader::downloadToFile(const std::string&, const std::string&, ProgressCallback, bool*, const std::string&, const std::string&) {
+  return HTTP_ERROR;
 }

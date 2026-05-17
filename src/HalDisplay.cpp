@@ -48,7 +48,7 @@ static void getLogicalWindowSize(GfxRenderer::Orientation orientation,
 }
 
 static void applyWindowGeometryIfNeeded(GfxRenderer::Orientation orientation) {
-  if (!window || !sdl_renderer)
+  if (!window)
     return;
 
   int winW = 0;
@@ -58,7 +58,9 @@ static void applyWindowGeometryIfNeeded(GfxRenderer::Orientation orientation) {
     return;
 
   SDL_SetWindowSize(window, winW, winH);
+#ifdef __APPLE__
   SDL_RenderSetLogicalSize(sdl_renderer, winW, winH);
+#endif
   currentWindowWidth = winW;
   currentWindowHeight = winH;
 }
@@ -87,22 +89,29 @@ void HalDisplay::begin() {
   int winH = 0;
   getLogicalWindowSize(getCurrentOrientation(), &winW, &winH);
 
-  // SDL_WINDOW_ALLOW_HIGHDPI lets the renderer use full Retina/HiDPI pixels on
-  // macOS so we get crisp 1:1 rendering instead of a blurry upscale.
+  // Linear filtering: Bayer-dithered pixels average to correct gray at scaled
+  // sizes rather than showing harsh black/white patterns.
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
+  // SDL_WINDOW_ALLOW_HIGHDPI + SDL_RenderSetLogicalSize are required on macOS
+  // Retina for crisp 1:1 rendering. On Linux/WSL they can cause an empty
+  // window, so they are only enabled on macOS.
+#ifdef __APPLE__
   window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
                             SDL_WINDOWPOS_UNDEFINED, winW, winH,
                             SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
   sdl_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-  // Keep all rendering logic in logical (winW×winH) coordinates; SDL maps to
-  // drawable pixels.
   SDL_RenderSetLogicalSize(sdl_renderer, winW, winH);
+#else
+  window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
+                            SDL_WINDOWPOS_UNDEFINED, winW, winH,
+                            SDL_WINDOW_SHOWN);
+  sdl_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+#endif
+
   currentWindowWidth = winW;
   currentWindowHeight = winH;
 
-  // Linear filtering: Bayer-dithered pixels average to correct gray at scaled
-  // sizes rather than showing harsh black/white patterns.
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
   texture = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888,
                               SDL_TEXTUREACCESS_STREAMING, DISPLAY_WIDTH,
                               DISPLAY_HEIGHT);

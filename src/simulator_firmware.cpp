@@ -1,9 +1,31 @@
 #include <Logging.h>
 
-#include "network/FirmwareFlasher.h"
-#include "network/OtaBootSwitch.h"
+#include <cstddef>
+
+// Simulator stubs for firmware flash and OTA boot operations.
+// These are no-ops in the simulator since flashing is not supported.
 
 namespace firmware_flash {
+enum class Result {
+  OK,
+  OPEN_FAIL,
+  TOO_SMALL,
+  TOO_LARGE,
+  BAD_MAGIC,
+  BAD_SEGMENTS,
+  BAD_CHECKSUM,
+  BAD_SHA,
+  BAD_SIZE,
+  NO_PARTITION,
+  OOM,
+  READ_FAIL,
+  ERASE_FAIL,
+  WRITE_FAIL,
+  OTADATA_FAIL,
+};
+
+using ProgressCb = void (*)(size_t, size_t, void *);
+
 Result flashFromSdPath(const char *, ProgressCb onProgress, void *ctx, bool) {
   LOG_DBG("FLASH",
           "[SIM] Firmware flashing is not supported in the native simulator");
@@ -58,6 +80,7 @@ const char *resultName(Result r) {
 } // namespace firmware_flash
 
 namespace ota_boot {
+struct esp_partition_t {};
 uint32_t computeSeqCrc(uint32_t) { return 0; }
 bool switchTo(const esp_partition_t *) {
   LOG_DBG("FLASH", "[SIM] Boot partition switching is not supported in the "
